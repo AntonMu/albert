@@ -116,11 +116,13 @@ class DataProcessor(object):
     @classmethod
     def _read_tsv(cls, input_file, subset=1.0, quotechar=None):
         """Reads a tab separated value file."""
+        
         with tf.gfile.Open(input_file, "r") as f:
             reader = csv.reader(f, delimiter="\t", quotechar=quotechar)
             lines = []
             for line in reader:
                 lines.append(line)
+            print(f"\n\n\n\n\n\n\n\n\n returning {int(len(lines) * subset)} of {len(lines)} total files.\n\n\n\n\n\n\n\n\n")
             return random.sample(lines, int(len(lines) * subset))
 
     def process_text(self, text):
