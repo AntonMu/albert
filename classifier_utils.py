@@ -22,6 +22,7 @@ from __future__ import print_function
 import collections
 import csv
 import os
+import random
 from albert import fine_tuning_utils
 from albert import modeling
 from albert import optimization
@@ -96,15 +97,15 @@ class DataProcessor(object):
         self.use_spm = use_spm
         self.do_lower_case = do_lower_case
 
-    def get_train_examples(self, data_dir):
+    def get_train_examples(self, data_dir, subset=1.0)):
         """Gets a collection of `InputExample`s for the train set."""
         raise NotImplementedError()
 
-    def get_dev_examples(self, data_dir):
+    def get_dev_examples(self, data_dir, subset=1.0)):
         """Gets a collection of `InputExample`s for the dev set."""
         raise NotImplementedError()
 
-    def get_test_examples(self, data_dir):
+    def get_test_examples(self, data_dir, subset=1.0)):
         """Gets a collection of `InputExample`s for prediction."""
         raise NotImplementedError()
 
@@ -113,14 +114,14 @@ class DataProcessor(object):
         raise NotImplementedError()
 
     @classmethod
-    def _read_tsv(cls, input_file, quotechar=None):
+    def _read_tsv(cls, input_file, subset=1.0, quotechar=None):
         """Reads a tab separated value file."""
         with tf.gfile.Open(input_file, "r") as f:
             reader = csv.reader(f, delimiter="\t", quotechar=quotechar)
             lines = []
             for line in reader:
                 lines.append(line)
-            return lines
+            return random.sample(lines, int(len(lines) * subset))
 
     def process_text(self, text):
         if self.use_spm:
@@ -195,22 +196,25 @@ class MisMnliProcessor(MnliProcessor):
 class MrpcProcessor(DataProcessor):
     """Processor for the MRPC data set (GLUE version)."""
 
-    def get_train_examples(self, data_dir):
+    def get_train_examples(self, data_dir, subset=1.0):
         """See base class."""
         return self._create_examples(
-            self._read_tsv(os.path.join(data_dir, "MRPC", "train.tsv")), "train"
+            self._read_tsv(os.path.join(data_dir, "MRPC", "train.tsv"), subset=subset),
+            "train",
         )
 
-    def get_dev_examples(self, data_dir):
+    def get_dev_examples(self, data_dir, subset=1.0):
         """See base class."""
         return self._create_examples(
-            self._read_tsv(os.path.join(data_dir, "MRPC", "dev.tsv")), "dev"
+            self._read_tsv(os.path.join(data_dir, "MRPC", "dev.tsv"), subset=subset),
+            "dev",
         )
 
-    def get_test_examples(self, data_dir):
+    def get_test_examples(self, data_dir, subset=1.0):
         """See base class."""
         return self._create_examples(
-            self._read_tsv(os.path.join(data_dir, "MRPC", "test.tsv")), "test"
+            self._read_tsv(os.path.join(data_dir, "MRPC", "test.tsv"), subset=subset),
+            "test",
         )
 
     def get_labels(self):

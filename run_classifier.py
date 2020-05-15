@@ -70,6 +70,9 @@ flags.DEFINE_string(
 )
 
 ## Other parameters
+flags.DEFINE_float("train_subset", 1.0, "The subset of the train set.")
+flags.DEFINE_float("dev_subset", 1.0, "The subset of the dev set.")
+flags.DEFINE_float("test_subset", 1.0, "The subset of the test set.")
 
 flags.DEFINE_string(
     "init_checkpoint",
@@ -252,7 +255,9 @@ def main(_):
 
     train_examples = None
     if FLAGS.do_train:
-        train_examples = processor.get_train_examples(FLAGS.data_dir)
+        train_examples = processor.get_train_examples(
+            FLAGS.data_dir, FLAGS.train_subset
+        )
     model_fn = classifier_utils.model_fn_builder(
         albert_config=albert_config,
         num_labels=len(label_list),
@@ -308,7 +313,7 @@ def main(_):
         estimator.train(input_fn=train_input_fn, max_steps=FLAGS.train_step)
 
     if FLAGS.do_eval:
-        eval_examples = processor.get_dev_examples(FLAGS.data_dir)
+        eval_examples = processor.get_dev_examples(FLAGS.data_dir, FLAGS.dev_subset)
         num_actual_eval_examples = len(eval_examples)
         if FLAGS.use_tpu:
             # TPU requires a fixed batch size for all batches, therefore the number
@@ -481,7 +486,9 @@ def main(_):
             )
 
     if FLAGS.do_predict:
-        predict_examples = processor.get_test_examples(FLAGS.data_dir)
+        predict_examples = processor.get_test_examples(
+            FLAGS.data_dir, FLAGS.test_subset
+        )
         num_actual_predict_examples = len(predict_examples)
         if FLAGS.use_tpu:
             # TPU requires a fixed batch size for all batches, therefore the number
