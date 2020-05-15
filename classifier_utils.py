@@ -97,15 +97,15 @@ class DataProcessor(object):
         self.use_spm = use_spm
         self.do_lower_case = do_lower_case
 
-    def get_train_examples(self, data_dir, subset=1.0)):
+    def get_train_examples(self, data_dir, subset=1.0):
         """Gets a collection of `InputExample`s for the train set."""
         raise NotImplementedError()
 
-    def get_dev_examples(self, data_dir, subset=1.0)):
+    def get_dev_examples(self, data_dir, subset=1.0):
         """Gets a collection of `InputExample`s for the dev set."""
         raise NotImplementedError()
 
-    def get_test_examples(self, data_dir, subset=1.0)):
+    def get_test_examples(self, data_dir, subset=1.0):
         """Gets a collection of `InputExample`s for prediction."""
         raise NotImplementedError()
 
@@ -116,13 +116,15 @@ class DataProcessor(object):
     @classmethod
     def _read_tsv(cls, input_file, subset=1.0, quotechar=None):
         """Reads a tab separated value file."""
-        
+
         with tf.gfile.Open(input_file, "r") as f:
             reader = csv.reader(f, delimiter="\t", quotechar=quotechar)
             lines = []
             for line in reader:
                 lines.append(line)
-            print(f"\n\n\n\n\n\n\n\n\n returning {int(len(lines) * subset)} of {len(lines)} total files.\n\n\n\n\n\n\n\n\n")
+            print(
+                f"\n\n\n\n\n\n\n\n\n returning {int(len(lines) * subset)} of {len(lines)} total lines.\n\n\n\n\n\n\n\n\n"
+            )
             return random.sample(lines, int(len(lines) * subset))
 
     def process_text(self, text):
